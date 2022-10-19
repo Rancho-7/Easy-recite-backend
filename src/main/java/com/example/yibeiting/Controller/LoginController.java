@@ -24,9 +24,9 @@ public class LoginController {
 //    String APPID, String APPSecret
     public Map<String,Object> login(String code){
         StringBuilder url = new StringBuilder("https://api.weixin.qq.com/sns/jscode2session?");
-        url.append("appid=wx84a7ca2869793f52");//appid设置
+        url.append("appid=****");//appid设置
 //        url.append(APPID);
-        url.append("&secret=683308651a09ae98d07faa5c55aa8591");//secret设置
+        url.append("&secret=****");//secret设置
 //        url.append(APPSecret);
 
         url.append("&js_code=");//code设置
