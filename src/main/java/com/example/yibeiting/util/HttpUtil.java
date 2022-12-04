@@ -1,4 +1,4 @@
-package com.baidu.ai.aip.utils;
+package com.example.yibeiting.util;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

@@ -1,7 +1,7 @@
-package com.example.yibeiting.Controller;
+package com.example.yibeiting.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.example.yibeiting.Utils.CommonUtils;
+import com.example.yibeiting.util.CommonUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -42,9 +42,9 @@ public class LoginController {
             String content = EntityUtils.toString(result);
             System.out.println(content);//打印返回的信息
             //JSONObject res = JSONObject.fromObject(content);//把信息封装为json
-            JSONObject res = CommonUtils.stringtoJSONObject(content);//把信息封装为json
+            JSONObject res = CommonUtil.stringtoJSONObject(content);//把信息封装为json
             //把信息封装到map
-            map = CommonUtils.parseJSON2Map(res);//这个小工具的代码在下面
+            map = CommonUtil.parseJSON2Map(res);//这个小工具的代码在下面
             System.out.println(map);
         } catch (Exception e) {
             e.printStackTrace();

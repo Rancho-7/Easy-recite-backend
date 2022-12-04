@@ -1,13 +1,12 @@
-package com.example.yibeiting.Utils;
+package com.example.yibeiting.util;
 
-import org.json.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
-public class CommonUtils {
+public class CommonUtil {
 
     public static JSONObject stringtoJSONObject(String str){
         JSONObject jsonObject=JSONObject.parseObject(str);
@@ -36,4 +35,10 @@ public class CommonUtils {
         }
         return map;
     }
+
+    //获得一个随机且唯一字符串
+    public static String generateUUID() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
 }

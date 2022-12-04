@@ -1,4 +1,4 @@
-package com.baidu.ai.aip.utils;
+package com.example.yibeiting.util;
 
 /**
  * Base64 工具类
