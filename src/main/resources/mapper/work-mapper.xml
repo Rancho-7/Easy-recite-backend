@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.yibeiting.dao.WorkMapper">
+
+    <sql id="insertFields">
+        work_id, ticket, tittle, description, content, status, create_time,records
+    </sql>
+
+    <select id="selectByTicket" resultType="com.example.yibeiting.entity.Work">
+        select *
+        from work
+        where ticket=#{ticket}
+    </select>
+
+    <select id="getContent" resultType="string">
+        select content
+        from work
+        where work_id=#{workId}
+    </select>
+
+    <select id="selectById" resultType="com.example.yibeiting.entity.Work">
+        select *
+        from work
+        where work_id = #{workId}
+    </select>
+    
+    <insert id="insertWork" parameterType="com.example.yibeiting.entity.Work" keyProperty="workId">
+        insert into work(<include refid="insertFields"></include>)
+        values (#{workId}, #{ticket}, #{tittle}, #{description}, #{content}, #{status}, #{createTime},#{records})
+    </insert>
+
+    <update id="updateWorkStatus">
+        update work set status=#{status}
+        where work_id=#{workId}
+    </update>
+
+    <update id="updateWork">
+        update work set tittle=#{tittle},description=#{description},content=#{content},status=#{status},create_time=#{createTime},records=#{records}
+        where work_id=#{workId}
+    </update>
+
+    <delete id="deleteWork" parameterType="java.lang.Integer">
+        delete
+        from work
+        where work_id=#{workId,jdbcType=INTEGER}
+    </delete>
+
+</mapper>

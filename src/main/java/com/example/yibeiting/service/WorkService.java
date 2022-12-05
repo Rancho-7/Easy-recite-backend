@@ -3,6 +3,8 @@ package com.example.yibeiting.service;
 import com.baidu.aip.speech.AipSpeech;
 import com.baidu.aip.speech.TtsResponse;
 import com.baidu.aip.util.Util;
+import com.example.yibeiting.dao.WorkMapper;
+import com.example.yibeiting.entity.Work;
 import com.example.yibeiting.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
@@ -25,6 +27,8 @@ public class WorkService {
     public static final String URL = "http://106.15.67.178:8080/";
     private volatile static AipSpeech client;
 
+    @Autowired
+    WorkMapper workMapper;
 
     //将作业文字转为语音
     public String transfer2Speech(String content) throws JSONException {
@@ -74,5 +78,47 @@ public class WorkService {
             }
         }
         return client;
+    }
+
+    //获取作业列表
+    public List getHomeWorkList(String ticket){
+        List<Work> list = new ArrayList<>();
+        list=workMapper.selectByTicket(ticket);
+        return list;
+    }
+
+    //获取作业答案
+    public String getContent(int workId){
+        String content = workMapper.getContent(workId);
+        return content;
+    }
+
+    //插入作业
+    public int insertWork(Work work){
+        workMapper.insertWork(work);
+        return 0;
+    }
+
+    //根据id获取作业详情
+    public Work getDetail(int workId){
+        return workMapper.selectById(workId);
+    }
+
+    //修改作业状态
+    public int updateWorkStatus(int workId,int status){
+        workMapper.updateWorkStatus(workId,status);
+        return 0;
+    }
+
+    //修改作业
+    public int updateWork(Work work,int workId){
+        workMapper.updateWork(work,workId);
+        return 0;
+    }
+
+    //根据作业id删除作业
+    public int deleteWork(int workId){
+        workMapper.deleteWork(workId);
+        return 0;
     }
 }

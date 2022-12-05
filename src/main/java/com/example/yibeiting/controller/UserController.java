@@ -1,15 +1,21 @@
 package com.example.yibeiting.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.yibeiting.entity.Answer;
+import com.example.yibeiting.entity.Work;
+import com.example.yibeiting.service.AnswerService;
 import com.example.yibeiting.service.AuthService;
 import com.example.yibeiting.service.WorkService;
 import com.example.yibeiting.util.Base64Util;
+import com.example.yibeiting.util.DateUtil;
 import com.example.yibeiting.util.FileUtil;
 import com.example.yibeiting.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,7 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -30,6 +39,9 @@ public class UserController {
 
     @Autowired
     WorkService workService;
+
+    @Autowired
+    AnswerService answerService;
 
     /**
      * 通用文字识别（普通精度版）
@@ -110,6 +122,117 @@ public class UserController {
             list.add(tmp);
         }
         return list;
+    }
+
+    //创建作业
+    @RequestMapping(path = "/createWork",method = RequestMethod.POST)
+    @ResponseBody
+    public List createWork(@RequestBody Work work) throws JSONException, ParseException {
+        List<String> list = new ArrayList<>();
+        String content = work.getContent();
+        list = transfer2Speech(content);
+        String s = JSON.toJSONString(list);
+        work.setRecords(s);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        String s0 = sdf.format(date);
+//        Date date2 = sdf.parse(s0);
+        Date resDate = DateUtil.strToDateyyyMMdd(s0);
+        work.setCreateTime(resDate);
+        workService.insertWork(work);
+        return list;
+    }
+
+    //获取作业列表
+    @RequestMapping(path = "/getWorklist",method = RequestMethod.GET)
+    @ResponseBody
+    public List getHomeWorkList(String ticket) throws ParseException {
+        System.out.println("ticket:"+ticket);
+        List<Work> list = new ArrayList<>();
+        list=workService.getHomeWorkList(ticket);
+        for (Work work:list){
+            Date createTime = work.getCreateTime();
+            if(createTime == null){
+                createTime = new Date();
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String s0 = sdf.format(createTime);
+            Date resDate = DateUtil.strToDateyyyMMdd(s0);
+            work.setCreateTime(resDate);
+//            System.out.println(work);
+            log.info("获取作业列表中的作业：{}",work);
+        }
+        return list;
+    }
+
+    //获取作业详情
+    @RequestMapping(path = "/getWorkDetail",method = RequestMethod.GET)
+    @ResponseBody
+    public Work getWorkDetail(int workId) throws ParseException {
+        Work work = workService.getDetail(workId);
+        Date createTime = work.getCreateTime();
+        if(createTime == null){
+            createTime = new Date();
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String s0 = sdf.format(createTime);
+        Date resDate = DateUtil.strToDateyyyMMdd(s0);
+        work.setCreateTime(resDate);
+        log.info("already got work:{}",work);
+        return work;
+    }
+
+    //更新作业
+    @RequestMapping(path = "/update",method = RequestMethod.POST)
+    @ResponseBody
+    public int updateWork(@RequestBody Work work, int workId){
+        workService.updateWork(work,workId);
+        return 0;
+    }
+
+    //创建答案
+    @RequestMapping(path = "/createAnswer",method = RequestMethod.POST)
+    @ResponseBody
+    public int createAnswer(@RequestBody Answer answer) throws JSONException {
+        log.info("The got answer is:{}",answer);
+        answerService.insertAnswer(answer);
+        int workId = answer.getWorkId();
+        int score = answer.getScore();
+        //作业状态： 0表示未完成  1表示不及格<60  2表示良好60~85  3表示优秀>85
+        int status = 0;
+        if (score <60){
+            status = 1;
+        }else if (score >= 60 && score <= 85){
+            status = 2;
+        }else if (score > 85 && score <= 100){
+            status = 3;
+        }
+        workService.updateWorkStatus(workId,status);
+        return 0;
+    }
+
+    //获取答案详情
+    @RequestMapping(path = "/getAnswerDetail",method = RequestMethod.GET)
+    @ResponseBody
+    public List getAnswerDetail(int workId){
+        List<Answer> list = new ArrayList<>();
+        list= answerService.getAnswerByworkId(workId);
+        return list;
+    }
+
+    //根据答案id删除答案
+    @RequestMapping(path = "/deleteAnswer",method = RequestMethod.POST)
+    @ResponseBody
+    public int deleteAnswer(int answerId){
+        return answerService.deleteAnswer(answerId);
+    }
+
+    //根据作业id删除作业
+    @RequestMapping(path = "/delete",method = RequestMethod.DELETE)
+    @ResponseBody
+    public int deleteWork(Integer workId){
+        log.info("删除作业id为{}的作业",workId);
+        return  workService.deleteWork(workId);
     }
 
 }
